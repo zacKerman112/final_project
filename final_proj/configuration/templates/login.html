@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body style="background-color: #1e1e1e; color: white; 
+font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+    <div style="background-color: #2d2d2d; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); width: 300px;">
+        <h2 style="text-align: center; margin-top: 0;">Sign In</h2>
+        <form method="POST">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+
+            {% if form.errors %}
+                <div style="color: #ff6b6b; margin-bottom: 15px; font-size: 14px;">
+                    {% for field, errors in form.errors.items %}
+                        {{ errors|striptags }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <button type="submit" style="width: 100%; padding: 10px; background-color: #4caf50; 
+            color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+                Log in
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

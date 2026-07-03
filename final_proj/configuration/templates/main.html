@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main page</title>
+    <style>
+        #burger-toggle {
+            display: none;
+        }
+
+        .burger-icon {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1001;
+        }
+        .burger-icon div {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 5px 0;
+            transition: 0.3s;
+        }
+
+        .burger-menu-content {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #2d2d2d;
+            box-shadow: 2px 0px 10px rgba(0,0,0,0.5);
+            padding-top: 60px;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .burger-menu-content a {
+            position: relative;
+            z-index: 1002;
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            border-bottom: 1px solid #333;
+        }
+
+        .burger-menu-content a:hover {
+            background-color: #4caf50;
+        }
+
+        #burger-toggle:checked ~ .burger-menu-content {
+            left: 0;
+        }
+
+        #burger-toggle:checked ~ .burger-icon .line1 {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+        #burger-toggle:checked ~ .burger-icon .line2 {
+            opacity: 0;
+        }
+        #burger-toggle:checked ~ .burger-icon .line3 {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+    </style>
+</head>
+<body style="background-color: #1e1e1e; color: white; font-family: Arial, sans-serif; margin: 0; padding: 20px;">
+
+    <input type="checkbox" id="burger-toggle">
+
+    <div class="burger-menu-content">
+        <a href="{% url 'profile' %}">Profile</a>
+        <a href="{% url 'my_orders' %}">My Orders</a>
+        <a href="{% url 'cart' %}">Cart</a>
+        <a href="{% url 'settings' %}">Settings</a>
+    </div>
+
+    <label for="burger-toggle" class="burger-icon">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+    </label>
+
+    <header style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 30px; margin-top: 10px;">
+        <h1 style="margin: 0; margin-left: 10px;">ShopBox</h1>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="https://t.me/shopboxeasybot" target="_blank" style="background-color: #0088cc; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-flex; align-items: center; transition: 0.2s;">
+                🤖 Our Telegram Bot
+            </a>
+
+            <a href="{% url 'logout' %}" style="color: #ff6b6b; text-decoration: none;">Logout</a>
+        </div>
+    </header>
+
+    <div style="display: flex; gap: 30px;">
+        
+        <aside style="width: 200px; background-color: #2d2d2d; padding: 20px; border-radius: 8px; height: fit-content;">
+            <h3 style="margin-top: 0;">Categories</h3>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for category in categories %}
+                    <li style="margin-bottom: 10px;">
+                        <a href="#" style="color: #4caf50; text-decoration: none;">{{ category.name }}</a>
+                    </li>
+                {% empty %}
+                    <li style="color: #aaa;">No categories yet</li>
+                {% endfor %}
+            </ul>
+        </aside>
+
+        <main style="flex: 1;">
+            <h2 style="margin-top: 0;">Our Products</h2>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                {% for item in items %}
+                    <div style="background-color: #2d2d2d; border-radius: 8px; padding: 15px; width: 220px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.name }}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
+                        {% endif %}
+                        
+                        <h4 style="margin: 0 0 10px 0;">{{ item.name }}</h4>
+                        <p style="color: #aaa; font-size: 14px; margin: 0 0 15px 0;">{{ item.description|truncatewords:10 }}</p>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: bold; color: #4caf50;">UAH {{ item.price }}</span>
+                            <form method="post" action="{% url 'buy_item' item.id %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" style="background-color: #4caf50; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Buy</button>
+                            </form>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p style="color: #aaa;">No products available out of stock</p>
+                {% endfor %}
+            </div>
+        </main>
+
+    </div>
+
+</body>
+</html>

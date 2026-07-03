@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .card {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+        }
+        .muted {
+            color: #aaa;
+        }
+        a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Settings</h1>
+    <p><a href="{% url 'main_page' %}">Back to shop</a></p>
+
+    <div class="card">
+        <h3 style="margin-top: 0;">Account details</h3>
+        <p><strong>Email:</strong> {{ profile_user.email }}</p>
+        <p><strong>Username:</strong> {{ profile_user.username }}</p>
+        <p><strong>Telegram:</strong> {{ profile_user.telegram_id|default:"Not connected" }}</p>
+        <p class="muted">Editing these settings can be added with a form later.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .order {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .muted {
+            color: #aaa;
+        }
+        a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+        ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>My Orders</h1>
+    <p><a href="{% url 'main_page' %}">Back to shop</a></p>
+
+    {% for order in orders %}
+        <div class="order">
+            <h3 style="margin-top: 0;">Order #{{ order.id }}</h3>
+            <p><strong>Status:</strong> {{ order.get_status_display }}</p>
+            <p><strong>Total:</strong> UAH {{ order.total_price }}</p>
+            <p class="muted">Created {{ order.created_at|date:"d M Y H:i" }}</p>
+
+            <h4>Items</h4>
+            <ul>
+                {% for order_item in order.items.all %}
+                    <li>
+                        {{ order_item.item.name|default:"Deleted item" }}
+                        x{{ order_item.quantity }} - UAH {{ order_item.price }}
+                    </li>
+                {% empty %}
+                    <li class="muted">No items in this order</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% empty %}
+        <p class="muted">You do not have orders yet.</p>
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .cart-item {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .muted {
+            color: #aaa;
+        }
+        a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cart</h1>
+    <p><a href="{% url 'main_page' %}">Back to shop</a></p>
+
+    {% for cart_item in cart_items %}
+        <div class="cart-item">
+            {% if cart_item.item.image %}
+                <img src="{{ cart_item.item.image.url }}" alt="{{ cart_item.item.name }}">
+            {% endif %}
+
+            <div>
+                <h3 style="margin-top: 0;">{{ cart_item.item.name }}</h3>
+                <p class="muted">{{ cart_item.item.description|truncatewords:12 }}</p>
+                <p><strong>Quantity:</strong> {{ cart_item.quantity }}</p>
+                <p><strong>Price:</strong> UAH {{ cart_item.item.price }}</p>
+                <p><strong>Line total:</strong> UAH {{ cart_item.line_total }}</p>
+            </div>
+        </div>
+    {% empty %}
+        <p class="muted">Your cart is empty.</p>
+    {% endfor %}
+
+    <h2>Total: UAH {{ total_price }}</h2>
+</body>
+</html>
