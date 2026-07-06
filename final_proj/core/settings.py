@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def load_env_file(path):
+    """Load environment variables from a file."""
     if not path.exists():
         return
 

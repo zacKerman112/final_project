@@ -3,18 +3,39 @@ import sys
 import django
 import asyncio
 import logging
+from pathlib import Path
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from asgiref.sync import sync_to_async
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def load_env_file(path):
+    """Load environment variables from a file."""
+    if not path.exists():
+        return
+    for line in path.read_text(encoding='utf-8').splitlines():
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+load_env_file(BASE_DIR / '.env')
+BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
+if not BOT_TOKEN:
+    raise RuntimeError('TELEGRAM_BOT_TOKEN is not set.')
+bot = Bot(token=BOT_TOKEN)
+
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 django.setup()
 
 from configuration.models import Item, Category
 
-BOT_TOKEN = '8814381174:AAEPdfe5rBPlZsDJCBhUO40xbzdsJ9Uly4k'
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
@@ -29,11 +50,13 @@ COMMANDS_TEXT = (
 
 @dp.message(Command('help'))
 async def help(message: types.Message):
+    """Show available commands."""
     await message.answer(COMMANDS_TEXT)
 
 
 @dp.message(Command('become_a_part_of_the_team'))
 async def become_a_part_of_the_team(message: types.Message):
+    """Become a part of the team."""
     await message.answer(
         'To become a part of the team, please contact us at @shopbox_team'
     )
