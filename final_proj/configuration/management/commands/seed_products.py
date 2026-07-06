@@ -1,8 +1,28 @@
+from io import BytesIO
 from decimal import Decimal
 
+from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
+from django.utils.text import slugify
+from PIL import Image, ImageDraw, ImageFont
 
 from configuration.models import Category, Item
+
+
+CATEGORY_STYLES = {
+    'electronics': {
+        'background': '#0f172a',
+        'accent': '#38bdf8',
+    },
+    'clothing': {
+        'background': '#2d1b4e',
+        'accent': '#f472b6',
+    },
+    'home-appliances': {
+        'background': '#14532d',
+        'accent': '#86efac',
+    },
+}
 
 
 PRODUCTS = {
@@ -90,6 +110,30 @@ PRODUCTS = {
 }
 
 
+def create_product_image(product_name, category_name, background, accent):
+    image = Image.new('RGB', (640, 420), background)
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.load_default()
+
+    draw.rounded_rectangle((32, 32, 608, 388), radius=28, outline=accent, width=6)
+    draw.rectangle((32, 290, 608, 388), fill=accent)
+
+    title = product_name[:32]
+    category = category_name.upper()
+
+    title_box = draw.textbbox((0, 0), title, font=font)
+    title_width = title_box[2] - title_box[0]
+    draw.text(((640 - title_width) / 2, 170), title, fill='white', font=font)
+
+    category_box = draw.textbbox((0, 0), category, font=font)
+    category_width = category_box[2] - category_box[0]
+    draw.text(((640 - category_width) / 2, 330), category, fill='black', font=font)
+
+    buffer = BytesIO()
+    image.save(buffer, format='PNG')
+    return ContentFile(buffer.getvalue())
+
+
 class Command(BaseCommand):
     help = 'Seed the database with sample categories and products.'
 
@@ -97,6 +141,7 @@ class Command(BaseCommand):
         created_categories = 0
         created_items = 0
         updated_items = 0
+        created_images = 0
 
         for slug, category_data in PRODUCTS.items():
             category, category_created = Category.objects.get_or_create(
@@ -122,11 +167,24 @@ class Command(BaseCommand):
                 else:
                     updated_items += 1
 
+                if not item.image:
+                    style = CATEGORY_STYLES[slug]
+                    image_file = create_product_image(
+                        item.name,
+                        category.name,
+                        style['background'],
+                        style['accent'],
+                    )
+                    image_name = f'seed/{slugify(item.name)}.png'
+                    item.image.save(image_name, image_file, save=True)
+                    created_images += 1
+
         self.stdout.write(
             self.style.SUCCESS(
                 'Seed completed: '
                 f'{created_categories} categories created, '
                 f'{created_items} products created, '
-                f'{updated_items} products updated.'
+                f'{updated_items} products updated, '
+                f'{created_images} product images created.'
             )
         )
